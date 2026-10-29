@@ -61,7 +61,12 @@ export class GoogleClient {
       }
 
       const t0 = Date.now();
-      const res = await fetch(url, { method: req.method ?? 'GET', headers, body });
+      const res = await fetch(url, {
+        method: req.method ?? 'GET',
+        headers,
+        body,
+        signal: AbortSignal.timeout(20000),
+      });
       const ms = Date.now() - t0;
       const method = req.method ?? 'GET';
 
@@ -75,7 +80,7 @@ export class GoogleClient {
         const waitSec = parseRetryAfter(res.headers.get('Retry-After'));
         if (attempt < MAX_ATTEMPTS) {
           console.log(`[google] ${method} ${req.path} → 429, sleeping ${waitSec}s before retry`);
-          await sleep(waitSec * 1000);
+          await sleep(Math.min(waitSec, 30) * 1000);
           continue;
         }
         throw new FitbitRateLimitError(waitSec, req.path);
@@ -83,9 +88,7 @@ export class GoogleClient {
 
       const text = await res.text();
       if (!res.ok) {
-        console.log(
-          `[google] ${method} ${req.path} → ${res.status} after ${ms}ms: ${text.slice(0, 300)}`,
-        );
+        console.log(`[google] ${method} ${req.path} → ${res.status} after ${ms}ms`);
         throw new FitbitApiError(res.status, text, req.path);
       }
       return text;

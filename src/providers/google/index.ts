@@ -35,12 +35,20 @@ import { getBodyLog } from './body';
 import { GoogleClient } from './client';
 import { listDevices } from './device';
 import { getExerciseList } from './exercise';
+import {
+  compactActivityLevels,
+  dailyAggregate,
+  detailedRecords,
+  exerciseRecords,
+  heartRateRollups,
+  hourlySteps,
+} from './extra';
 import { getFoodLog } from './food';
 import { getCardioFitness, getHeartRateRange } from './heart';
 import { getHeartRateIntraday } from './intraday';
 import { getHRV, getRespiratoryRate, getSkinTemperature, getSpO2 } from './metrics';
 import { getProfile } from './profile';
-import { getSleep, getSleepRange } from './sleep';
+import { getSleep, getSleepDetails, getSleepRange } from './sleep';
 import { getDailySummary } from './summary';
 
 /** Thrown by write/delete methods not implemented in this read-only edition. */
@@ -66,6 +74,28 @@ export class GoogleHealthProvider implements HealthProvider {
   }
   listDevices(): Promise<Device[]> {
     return listDevices(this.client);
+  }
+  getDailyAggregate(slug: string, key: string, start: string, end: string) {
+    return dailyAggregate(this.client, slug, key, start, end);
+  }
+  getHeartRateRollups(start: string, end: string) {
+    return heartRateRollups(this.client, start, end);
+  }
+  getExerciseRecords(start: string, end: string) {
+    return exerciseRecords(this.client, start, end);
+  }
+  async getDetailedRecords(
+    slug: string,
+    key: string,
+    kind: 'sample' | 'interval' | 'daily',
+    start: string,
+    end: string,
+  ) {
+    const points = await detailedRecords(this.client, slug, key, kind, start, end);
+    return slug === 'activity-level' ? compactActivityLevels(points) : points;
+  }
+  getHourlySteps(start: string, end: string) {
+    return hourlySteps(this.client, start, end);
   }
   getDailySummary(date: string): Promise<DailySummary> {
     return getDailySummary(this.client, date);
@@ -94,6 +124,9 @@ export class GoogleHealthProvider implements HealthProvider {
   }
   getSleepRange(start: string, end: string): Promise<SleepLog[]> {
     return getSleepRange(this.client, start, end);
+  }
+  getSleepDetails(start: string, end: string) {
+    return getSleepDetails(this.client, start, end);
   }
   getBodyLog(start: string, end: string): Promise<BodyLog> {
     return getBodyLog(this.client, start, end);

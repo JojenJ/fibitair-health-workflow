@@ -49,8 +49,8 @@ export async function getSpO2(
     dateTime,
     value: {
       avg: num(v.averagePercentage),
-      min: num(v.lowerBoundPercentage),
-      max: num(v.upperBoundPercentage),
+      lowerBoundPercentage: num(v.lowerBoundPercentage),
+      upperBoundPercentage: num(v.upperBoundPercentage),
     },
   }));
 }

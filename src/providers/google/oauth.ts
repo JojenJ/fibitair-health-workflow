@@ -77,6 +77,7 @@ export async function refreshTokens(env: Env, refreshToken: string): Promise<Tok
 
   const res = await fetch(GOOGLE_TOKEN_URL, {
     method: 'POST',
+    signal: AbortSignal.timeout(20000),
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body,
   });

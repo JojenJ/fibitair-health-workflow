@@ -279,6 +279,8 @@ export const SpO2DaySchema = z.object({
   dateTime: z.string(),
   value: z.object({
     avg: z.number().optional(),
+    lowerBoundPercentage: z.number().optional(),
+    upperBoundPercentage: z.number().optional(),
     min: z.number().optional(),
     max: z.number().optional(),
   }),

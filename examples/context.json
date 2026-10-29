@@ -1,0 +1,27 @@
+[
+  {
+    "id": "example-class-2026-11-02",
+    "day": "2026-11-02",
+    "kind": "class",
+    "title": "示例：上午课程（请替换）",
+    "minutes": 120,
+    "intensity": "medium"
+  },
+  {
+    "id": "example-research-2026-11-03",
+    "day": "2026-11-03",
+    "kind": "research",
+    "title": "示例：论文实验（请替换）",
+    "minutes": 180,
+    "intensity": "high"
+  },
+  {
+    "id": "example-exercise-2026-11-03",
+    "day": "2026-11-03",
+    "kind": "exercise",
+    "title": "示例：轻松跑（请替换）",
+    "minutes": 30,
+    "intensity": "low",
+    "notes": "计划，可调整"
+  }
+]

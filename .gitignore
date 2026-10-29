@@ -13,6 +13,11 @@ build/
 # Each fork has its own KV namespace ids — keep local wrangler.toml out of VCS.
 # wrangler.toml.example is the committed template.
 wrangler.toml
+wrangler.workflow.toml
+wrangler.local.toml
+oauth-client*.json
+secrets/
+exports/
 
 # Environment
 .env

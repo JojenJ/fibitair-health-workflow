@@ -69,7 +69,6 @@ function mapSleep(dp: Record<string, unknown>): SleepLog | undefined {
     minutesAwake: Math.round((bySec.wake ?? 0) / 60),
     timeInBed: Math.round(duration / 60000),
     type: typeof s.type === 'string' ? s.type.toLowerCase() : undefined,
-    isMainSleep: true,
     levels: { summary, data },
   };
 }
@@ -77,6 +76,22 @@ function mapSleep(dp: Record<string, unknown>): SleepLog | undefined {
 async function allSleep(client: Pick<GoogleClient, 'requestJson'>): Promise<SleepLog[]> {
   const dps = await reconcile(client, 'sleep', PAGE);
   return dps.map(mapSleep).filter((x): x is SleepLog => x !== undefined);
+}
+
+/** Retain the source session and data source metadata alongside normalized sleep. */
+export async function getSleepDetails(
+  client: Pick<GoogleClient, 'requestJson'>,
+  start: string,
+  end: string,
+) {
+  const dps = await reconcile(client, 'sleep', PAGE);
+  return dps.flatMap((dp) => {
+    const normalized = mapSleep(dp);
+    if (!normalized) throw new Error('Unrecognized sleep session');
+    return normalized.dateOfSleep >= start && normalized.dateOfSleep <= end
+      ? [{ day: normalized.dateOfSleep, value: dp }]
+      : [];
+  });
 }
 
 export async function getSleep(

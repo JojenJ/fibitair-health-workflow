@@ -1,0 +1,34 @@
+name = "personal-health-workflow"
+main = "src/workflow/worker.ts"
+compatibility_date = "2026-04-21"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+WEEKLY_EMAIL = "false"
+# After the first deployment, replace this with the exact HTTPS origin printed by
+# Wrangler (no path or trailing slash), then deploy again before connecting MCP.
+PUBLIC_ORIGIN = "https://YOUR-WORKER.YOUR-SUBDOMAIN.workers.dev"
+# SELF_EMAIL is installed as a secret from the verified Gmail OAuth identity.
+
+[triggers]
+# UTC: 08:15, 14:15, 20:15, 02:15 Shanghai; weekly packet Monday 09:00.
+crons = ["15 */6 * * *", "0 1 * * MON"]
+
+[observability]
+enabled = false
+
+[[kv_namespaces]]
+binding = "OAUTH_KV"
+id = "REPLACE_OAUTH_ID"
+
+[[kv_namespaces]]
+binding = "TOKENS"
+id = "REPLACE_TOKENS_ID"
+[[kv_namespaces]]
+binding = "CACHE"
+id = "REPLACE_CACHE_ID"
+[[d1_databases]]
+binding = "DB"
+database_name = "personal-health-archive"
+database_id = "REPLACE_DATABASE_ID"
+migrations_dir = "migrations"

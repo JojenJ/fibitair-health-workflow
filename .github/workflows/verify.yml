@@ -1,0 +1,42 @@
+name: Reproduce without cloud credentials
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.30.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm lint
+      - name: Prepare dummy bindings
+        shell: bash
+        run: |
+          node --input-type=module <<'JS'
+          import { readFileSync, writeFileSync } from 'node:fs';
+          const source = readFileSync('wrangler.workflow.toml.example', 'utf8')
+            .replace(/REPLACE_(OAUTH|TOKENS|CACHE)_ID/g, '0'.repeat(32))
+            .replace('REPLACE_DATABASE_ID', '00000000-0000-0000-0000-000000000001');
+          writeFileSync('wrangler.local.toml', source);
+          JS
+      - name: Bundle only (no deployment)
+        run: pnpm exec wrangler deploy --dry-run -c wrangler.local.toml --outdir .wrangler/ci-bundle
+      - name: Apply migrations to an empty local database
+        run: pnpm exec wrangler d1 migrations apply DB --local -c wrangler.local.toml

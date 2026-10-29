@@ -15,11 +15,21 @@ export async function reconcile(
   slug: string,
   pageSize: number,
 ): Promise<Array<Record<string, unknown>>> {
-  const raw = await client.requestJson(ReconcileResponseSchema, {
-    path: `/v4/users/me/dataTypes/${slug}/dataPoints:reconcile`,
-    query: { pageSize },
-  });
-  return raw.dataPoints ?? [];
+  const points: Array<Record<string, unknown>> = [];
+  const seen = new Set<string>();
+  let pageToken: string | undefined;
+  for (let page = 0; page < 20; page++) {
+    const raw = await client.requestJson(ReconcileResponseSchema, {
+      path: `/v4/users/me/dataTypes/${slug}/dataPoints:reconcile`,
+      query: { pageSize, ...(pageToken ? { pageToken } : {}) },
+    });
+    points.push(...(raw.dataPoints ?? []));
+    if (!raw.nextPageToken) return points;
+    if (seen.has(raw.nextPageToken)) throw new Error('Repeated reconciliation page token');
+    seen.add(raw.nextPageToken);
+    pageToken = raw.nextPageToken;
+  }
+  throw new Error('Reconciliation page budget exceeded; refusing incomplete data');
 }
 
 export function isRecord(v: unknown): v is Record<string, unknown> {

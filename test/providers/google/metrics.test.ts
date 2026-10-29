@@ -54,7 +54,7 @@ describe('getHRV', () => {
 });
 
 describe('getSpO2', () => {
-  it('maps average/lower/upper percentage to avg/min/max', async () => {
+  it('maps average and confidence bounds without claiming extrema', async () => {
     const fixture = {
       dataPoints: [
         {
@@ -68,7 +68,12 @@ describe('getSpO2', () => {
       ],
     };
     const out = await getSpO2(client(fixture), '2026-07-16', '2026-07-16');
-    expect(out).toEqual([{ dateTime: '2026-07-16', value: { avg: 97.5, min: 95.2, max: 99.1 } }]);
+    expect(out).toEqual([
+      {
+        dateTime: '2026-07-16',
+        value: { avg: 97.5, lowerBoundPercentage: 95.2, upperBoundPercentage: 99.1 },
+      },
+    ]);
     expect(() => SpO2DaySchema.parse(out[0])).not.toThrow();
   });
 });

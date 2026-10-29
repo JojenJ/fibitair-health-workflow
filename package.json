@@ -1,19 +1,20 @@
 {
-  "name": "google-health-worker-mcp-v1",
+  "name": "fibitair-health-workflow",
   "version": "0.1.0",
-  "description": "Remote MCP server on Cloudflare Workers connecting Claude to the Google Health API v4: comprehensive health-data reads and photo-driven food logging for Claude mobile.",
+  "description": "Private Google Health archive with quiet scheduled collection, weekly Gmail packets and read-only MCP.",
   "private": true,
   "type": "module",
   "license": "MIT",
   "author": "Yuto Tachibana",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Ring8688/google-health-worker-mcp-V1.git"
+    "url": "https://github.com/JojenJ/fibitair-health-workflow.git"
   },
   "scripts": {
-    "dev": "wrangler dev",
-    "deploy": "wrangler deploy",
-    "setup:google": "tsx scripts/setup-google.ts",
+    "dev": "wrangler dev -c wrangler.local.toml",
+    "deploy": "wrangler deploy -c wrangler.workflow.toml",
+    "workflow:setup": "tsx scripts/workflow-setup.ts",
+    "legacy:setup:google": "tsx scripts/setup-google.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
@@ -21,9 +22,10 @@
     "format": "biome format --write ."
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22.13"
   },
   "dependencies": {
+    "@cloudflare/workers-oauth-provider": "1.2.4",
     "@hono/mcp": "^0.2",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "hono": "^4.7.0",
@@ -33,6 +35,7 @@
     "@biomejs/biome": "^2",
     "@cloudflare/workers-types": "^4.20260421.1",
     "@types/node": "^22",
+    "playwright-core": "^1.64.1",
     "tsx": "^4",
     "typescript": "^5.7",
     "vitest": "^2",

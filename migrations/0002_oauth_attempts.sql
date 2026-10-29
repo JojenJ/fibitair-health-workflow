@@ -1,0 +1,3 @@
+CREATE TABLE IF NOT EXISTS oauth_attempts (
+  key TEXT PRIMARY KEY, count INTEGER NOT NULL, reset_at INTEGER NOT NULL
+);
